@@ -20,9 +20,9 @@ jobs:
         check-latest: true
 
     - name: Lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
-        version: v1.50.1
+        version: v1.57.3
   test:
     runs-on: ubuntu-latest
     steps:
