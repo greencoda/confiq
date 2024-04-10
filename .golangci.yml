@@ -1,0 +1,51 @@
+# Refer to golangci-lint's example config file for more options and information:
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.reference.yml
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable-all: true
+  disable:
+  - dupl
+  - funlen
+  - gochecknoglobals
+  - lll
+  - revive
+  - varnamelen
+
+linters-settings:
+  cyclop:
+    max-complexity: 20
+  depguard:
+    rules:
+      main:
+        files:
+          - "!$test"
+        allow:
+          - $gostd
+          - github.com/greencoda
+          - github.com/hashicorp/go-envparse
+          - github.com/pelletier/go-toml
+  ireturn:
+    allow:
+      - anon
+      - error
+      - empty
+      - stdlib
+      - segment
+  paralleltest:
+    ignore-missing: true
+  interfacebloat:
+    max: 20
+  exhaustive:
+    ignore-enum-members: "reflect.+"
+  gosec:
+    excludes:
+    - G404
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

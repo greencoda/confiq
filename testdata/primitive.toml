@@ -1,0 +1,9 @@
+# Primitives
+test_bool = true
+test_int = 22
+test_bigint = -23
+test_uint = 24
+test_biguint = 25
+test_string = "test"
+test_bigfloat = 6.9
+test_float = 0.1234567890123456

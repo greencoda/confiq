@@ -1,0 +1,7 @@
+{
+    "dns": "host=127.0.0.1 user=postgres password=postgres dbname=database port=5432 sslmode=disable",
+    "settings": {
+        "maxConnections": 10,
+        "runMigrations": true
+    }
+}

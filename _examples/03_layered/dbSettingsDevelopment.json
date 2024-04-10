@@ -1,0 +1,3 @@
+{
+    "dns": "host=development-server.dbhost.company.io user=postgres password=supersecret dbname=devdb port=5432 sslmode=disable"
+}

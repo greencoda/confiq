@@ -1,0 +1,10 @@
+test_bool: true
+test_int: 22
+test_bigint: -23
+test_uint: 24
+test_biguint: 25
+test_string: test
+test_bigfloat: 6.9
+test_url: 'https://www.google.com'
+test_duration: 42s
+test_datetime: 2016-01-13T07:00:00.000Z

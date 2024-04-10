@@ -1,0 +1,36 @@
+{
+    "settingName": "Test",
+    "settingCfg": {
+        "setting_key_1": "alpha",
+        "setting_key_2": 42
+    },
+    "settingIP": "127.0.0.1",
+    "settingPointer": "eu-west-1",
+    "settingCount": "1",
+    "settingExpiration": "2025-01-13T16:00:00+09:00",
+    "settingEnabled": true,
+    "settingAPIGroup": {
+        "url": "http://service-api-1.com/v1",
+        "timeout": "15s"
+    },
+    "settingDBGroup": {
+        "dns": "host=127.0.0.1 user=postgres password=postgres dbname=database port=5432 sslmode=disable",
+        "maxConnections": 10,
+        "runMigrations": true
+    },
+    "outputAPIs": [
+        {
+            "url": "http://output-api-1.com/v1",
+            "timeout": "120s"
+        },
+        {
+            "url": "http://output-api-2.com/v1",
+            "timeout": "60s"
+        }
+    ],
+    "apiTokens": [
+        "5b64d15b797d4ed28a64ced10e96a5a8",
+        "b5fa76d480af45c8a3524b8dea4cb096",
+        "7d60f8a5936142438fadefad86cf1efe"
+    ]
+}

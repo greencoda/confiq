@@ -1,0 +1,2 @@
+url = "http://service-api-1.com/v1"
+timeout = "15s"

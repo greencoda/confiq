@@ -1,0 +1,16 @@
+{
+    "test_float": 0.1234567890123456,
+    "test_float_string": "0.1234567890123456",
+    "test_float_invalid_format": true,
+    "test_int": 64,
+    "test_int_string": "64",
+    "test_int_invalid_format": true,
+    "test_bigint": -23,
+    "test_uint": 24,
+    "test_biguint": 25,
+    "test_string": "test",
+    "test_string_invalid_format": 0,
+    "test_bool": true,
+    "test_bool_string": "true",
+    "test_bool_invalid_format": 1.1
+}

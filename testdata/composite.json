@@ -1,0 +1,20 @@
+{
+    "test_section": {
+        "test_string": "efes",
+        "test_string_array": [
+            "aleph",
+            "beth",
+            "gimel"
+        ]
+    },
+    "test_map": {
+        "test_map_key_1": 1,
+        "test_map_key_2": 2,
+        "test_map_key_3": 3
+    },
+    "test_slice": [
+        "uno",
+        "dos",
+        "tres"
+    ]
+}

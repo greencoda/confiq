@@ -1,0 +1,5 @@
+{
+    "test_bigfloat": 6.9,
+    "test_bigint": -23,
+    "test_biguint": 25,
+    "test_bool": true,
