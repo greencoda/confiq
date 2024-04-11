@@ -28,6 +28,7 @@ linters-settings:
           - github.com/greencoda
           - github.com/hashicorp/go-envparse
           - github.com/pelletier/go-toml
+          - github.com/davecgh/go-spew/spew
   ireturn:
     allow:
       - anon

@@ -149,11 +149,11 @@ type customType struct {
 	Value string
 }
 
-func (t customType) Decode(targetField reflect.Value, value any) error {
+func (t *customType) Decode(value any) error {
 	if stringValue, ok := value.(string); !ok {
-		return errValueIsNotString
+		return errors.New("value is not a string")
 	} else {
-		targetField.FieldByName("Value").SetString(stringValue)
+		t.Value = stringValue
 
 		return nil
 	}

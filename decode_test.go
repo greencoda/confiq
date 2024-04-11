@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"reflect"
 	"strconv"
 	"testing"
 
@@ -34,11 +33,11 @@ type customDecoderStruct struct {
 	InternalValue string
 }
 
-func (t customDecoderStruct) Decode(targetField reflect.Value, value any) error {
+func (t *customDecoderStruct) Decode(value any) error {
 	if stringValue, ok := value.(string); !ok {
 		return errValueIsNotString
 	} else {
-		targetField.FieldByName("InternalValue").SetString(stringValue)
+		t.InternalValue = stringValue
 
 		return nil
 	}

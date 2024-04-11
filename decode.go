@@ -47,7 +47,7 @@ func newEmptyFieldOptions() fieldOptions {
 }
 
 type Decoder interface {
-	Decode(targetField reflect.Value, value any) error
+	Decode(value any) error
 }
 
 func (c *ConfigSet) decode(target interface{}, path string, strict bool) error {
@@ -138,9 +138,9 @@ func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOption
 		return decodedFields, nil
 	}
 
-	// Check if targetValue implements Decoder interface
-	if decoder, ok := targetValue.Interface().(Decoder); ok {
-		if err := decoder.Decode(targetValue, fieldConfigValue); err != nil {
+	// check if targetValue implements Decoder interface
+	if decoder, ok := targetValue.Addr().Interface().(Decoder); ok {
+		if err := decoder.Decode(fieldConfigValue); err != nil {
 			return 0, fmt.Errorf("%w: %w", errCannotDecodeCustomTypeField, err)
 		}
 
@@ -175,23 +175,22 @@ func (c *ConfigSet) decodeMap(targetMapValue reflect.Value, configValue any, str
 		setFieldCount      = 0
 	)
 
-	// Setup empty map
+	// setup empty map
 	targetMapValue.Set(reflect.MakeMap(targetMapValueType))
 
 	for _, key := range configMapValue.MapKeys() {
-		// Setup
 		var (
 			k = reflect.New(targetKeyType).Elem()
 			v = reflect.New(targetValueType).Elem()
 		)
 
-		// Decode map key
+		// decode map key
 		_, err := c.decodePrimitiveType(k, key.Interface(), strict)
 		if err != nil {
 			return 0, fmt.Errorf("error decoding map key: %w", err)
 		}
 
-		// Decode map value
+		// decode map value
 		decodedFieldCount, err := c.subValue(configValue).
 			decodeField(v, fieldOptions{
 				path:         keySegment(key.String()).String(),
@@ -218,20 +217,21 @@ func (c *ConfigSet) decodeStruct(targetStructValue reflect.Value, configValue an
 	)
 
 	for i := range targetStructValue.NumField() {
-		// Get the struct field's tag and options
+		// get the struct field's tag and options
 		targetStructFieldOpts := c.readTag(targetStructType.Field(i), c.decoder.tag)
 
-		// Get the struct field's reflection value
+		// get the struct field's reflection value
 		targetStructFieldValue := targetStructValue.Field(i)
 
-		// Check if the field is exported
+		// check if the field is exported
 		if !targetStructFieldValue.CanSet() || !targetStructFieldValue.Addr().CanInterface() {
 			continue
 		}
 
+		// set the field's strictness
 		targetStructFieldOpts.strict = strict || targetStructFieldOpts.strict
 
-		// Decode the field
+		// decode the field
 		decodedFieldCount, err := c.subValue(configValue).
 			decodeField(targetStructFieldValue, targetStructFieldOpts)
 		if err != nil {
@@ -286,7 +286,7 @@ func (c *ConfigSet) decodeSlice(targetSliceValue reflect.Value, configValue any,
 func (c *ConfigSet) decodePrimitiveType(primitiveValue reflect.Value, configValue any, strict bool) (int, error) {
 	primitiveInterface := primitiveValue.Addr().Interface()
 
-	// Check if primitive implements encoding.TextUnmarshaler interface
+	// check if primitive implements encoding.TextUnmarshaler interface
 	if unmarshaler, ok := primitiveInterface.(encoding.TextUnmarshaler); ok {
 		if err := unmarshaler.UnmarshalText(castToBytes(configValue)); err != nil {
 			return 0, fmt.Errorf("%w: %w", errCannotUnmarshalPrimitive, err)
@@ -297,7 +297,7 @@ func (c *ConfigSet) decodePrimitiveType(primitiveValue reflect.Value, configValu
 		return 1, nil
 	}
 
-	// Select the appropriate decoder function based on the primitive's kind
+	// select the appropriate decoder function based on the primitive's kind
 	var (
 		primitiveDecoderFunc decoderFunc
 		primitiveValueKind   = primitiveValue.Kind()
@@ -345,7 +345,7 @@ func (c *ConfigSet) readTag(field reflect.StructField, tag string) fieldOptions 
 		}
 	)
 
-	// Read the remaining tag parts
+	// read the remaining tag parts
 	for _, part := range tagParts[1:] {
 		if part == "strict" {
 			fieldOpts.strict = true
