@@ -1,6 +1,7 @@
 [![godoc for greencoda/confiq][godoc-badge]][godoc-url]
-[![Build Status][actions-badge]][actions-url]
 [![Go 1.22][goversion-badge]][goversion-url]
+[![Build Status][actions-badge]][actions-url]
+[![Go Coverage](https://github.com/greencoda/confiq/wiki/coverage.svg)](https://raw.githack.com/wiki/greencoda/confiq/coverage.html)
 [![Go Report card][goreportcard-badge]][goreportcard-url]
 
 <p align="center"><img src=".github/splash_image.png" width="500"></p>
