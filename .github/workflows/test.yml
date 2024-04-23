@@ -40,10 +40,14 @@ jobs:
 
     - name: Run Test
       run: make test
+
+    - name: Copy coverage.out file to temp
+      run: cp coverage.out $RUNNER_TEMP
       
     - name: Update coverage report
       uses: ncruces/go-coverage-report@v0
       with:
+        coverage-file: ${{ runner.temp }}/coverage.out
         report: true
         chart: true
         amend: true
