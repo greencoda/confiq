@@ -6,6 +6,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/greencoda/confiq"
+
+	confiqjson "github.com/greencoda/confiq/loaders/json"
 )
 
 // DBSettings is a struct which holds the database settings.
@@ -25,7 +27,7 @@ func main() {
 	configSet := confiq.New()
 
 	// Load the base DB settings from a JSON file into the config set, with a prefix of "dbSettings".
-	if err := configSet.LoadJSONFromFile("./dbSettingsBase.json", confiq.WithPrefix("dbSettings")); err != nil {
+	if err := configSet.Load(confiqjson.Load().FromFile("./dbSettingsBase.json"), confiq.WithPrefix("dbSettings")); err != nil {
 		log.Fatal(err)
 	}
 
@@ -63,7 +65,7 @@ func main() {
 }
 
 func loadDBConfig(configSet *confiq.ConfigSet, configFile string) {
-	if err := configSet.LoadYAMLFromFile(configFile, confiq.WithPrefix("dbSettings")); err != nil {
+	if err := configSet.Load(confiqjson.Load().FromFile(configFile), confiq.WithPrefix("dbSettings")); err != nil {
 		log.Fatal(err)
 	}
 }

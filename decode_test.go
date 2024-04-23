@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/greencoda/confiq"
+	"github.com/greencoda/confiq/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -46,7 +47,8 @@ func (t *customDecoderStruct) Decode(value any) error {
 type DecodeTestSuite struct {
 	suite.Suite
 
-	configSet *confiq.ConfigSet
+	configSet      *confiq.ConfigSet
+	valueContainer *mocks.IValueContainer
 }
 
 func Test_Decoder(t *testing.T) {
@@ -59,12 +61,16 @@ func (s *DecodeTestSuite) SetupTest() {
 	s.configSet = confiq.New(
 		confiq.WithTag("cfg"),
 	)
+	s.valueContainer = mocks.NewIValueContainer(s.T())
 
 	s.Require().NotNil(s.T(), s.configSet)
 }
 
 func (s *DecodeTestSuite) Test_Decode_UnsupportedPrimitive() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int": 64}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -79,7 +85,18 @@ func (s *DecodeTestSuite) Test_Decode_UnsupportedPrimitive() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Slice() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_slice": []any{
+				"uno",
+				"dos",
+				"tres",
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -102,7 +119,18 @@ func (s *DecodeTestSuite) Test_Decode_Slice() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Slice_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_map": map[string]any{
+				"test_map_key_1": 1,
+				"test_map_key_2": 2,
+				"test_map_key_3": 3,
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -117,7 +145,18 @@ func (s *DecodeTestSuite) Test_Decode_Slice_FromInvalidFormat() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Slice_FromInvalidConfigValueType() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_slice": []any{
+				"uno",
+				"dos",
+				"tres",
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -132,7 +171,18 @@ func (s *DecodeTestSuite) Test_Decode_Slice_FromInvalidConfigValueType() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Map() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_map": map[string]any{
+				"test_map_key_1": 1,
+				"test_map_key_2": 2,
+				"test_map_key_3": 3,
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -155,7 +205,18 @@ func (s *DecodeTestSuite) Test_Decode_Map() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Map_FromInvalidKeyFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_map": map[string]any{
+				"test_map_key_1": 1,
+				"test_map_key_2": 2,
+				"test_map_key_3": 3,
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -170,7 +231,18 @@ func (s *DecodeTestSuite) Test_Decode_Map_FromInvalidKeyFormat() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_Map_FromInvalidValueFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_map": map[string]any{
+				"test_map_key_1": 1,
+				"test_map_key_2": 2,
+				"test_map_key_3": 3,
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -185,7 +257,10 @@ func (s *DecodeTestSuite) Test_Decode_Map_FromInvalidValueFormat() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_PointerField() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -204,7 +279,16 @@ func (s *DecodeTestSuite) Test_Decode_PointerField() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_PointerField_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_section": map[string]any{
+				"test_string": "efes",
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetSubStruct struct {
@@ -223,7 +307,10 @@ func (s *DecodeTestSuite) Test_Decode_PointerField_FromInvalidFormat() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_TextUnmarshalablePrimitive() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int_string": "64"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -242,7 +329,10 @@ func (s *DecodeTestSuite) Test_Decode_TextUnmarshalablePrimitive() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_TextUnmarshalablePrimitive_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -257,7 +347,16 @@ func (s *DecodeTestSuite) Test_Decode_TextUnmarshalablePrimitive_FromInvalidForm
 }
 
 func (s *DecodeTestSuite) Test_Decode_CustomDecoder() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_section": map[string]any{
+				"test_string": "efes",
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -276,7 +375,17 @@ func (s *DecodeTestSuite) Test_Decode_CustomDecoder() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_CustomDecoder_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_section": map[string]any{
+				"test_string":       "efes",
+				"test_string_array": []any{"aleph", "beth", "gimel"},
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -291,7 +400,10 @@ func (s *DecodeTestSuite) Test_Decode_CustomDecoder_FromInvalidFormat() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_UnexportedField() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -313,7 +425,10 @@ func (s *DecodeTestSuite) Test_Decode_UnexportedField() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_DefaultWithRequired() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -328,7 +443,10 @@ func (s *DecodeTestSuite) Test_Decode_DefaultWithRequired() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_RequiredFieldMissing() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -343,7 +461,10 @@ func (s *DecodeTestSuite) Test_Decode_RequiredFieldMissing() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_StringAsSlice() {
-	loadErr := s.configSet.LoadEnvFromString("TEST_STRINGS=test1;test2;test3")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"TEST_STRINGS": "test1;test2;test3"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -366,7 +487,10 @@ func (s *DecodeTestSuite) Test_Decode_StringAsSlice() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_InvalidAsSlice() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -381,7 +505,10 @@ func (s *DecodeTestSuite) Test_Decode_InvalidAsSlice() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_DefaultField() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -400,7 +527,10 @@ func (s *DecodeTestSuite) Test_Decode_DefaultField() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_MissingField() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -415,7 +545,10 @@ func (s *DecodeTestSuite) Test_Decode_MissingField() {
 }
 
 func (s *DecodeTestSuite) Test_Decode_EmptyTag() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetSubStruct struct {
@@ -438,7 +571,10 @@ func (s *DecodeTestSuite) Test_Decode_EmptyTag() {
 }
 
 func (s *DecodeTestSuite) Test_StrictDecode() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url_invalid_format": "missing_protocol://test.com"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {

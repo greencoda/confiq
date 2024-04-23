@@ -6,6 +6,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/greencoda/confiq"
+
+	confiqjson "github.com/greencoda/confiq/loaders/json"
 )
 
 var errValueIsNotString = errors.New("value is not a string")
@@ -52,7 +54,9 @@ func main() {
 	configSet := confiq.New()
 
 	// Load the DB settings from a JSON file into the config set.
-	if err := configSet.LoadJSONFromFile("./plumbus.json"); err != nil {
+	if err := configSet.Load(
+		confiqjson.Load().FromFile("./plumbus.json"),
+	); err != nil {
 		log.Fatal(err)
 	}
 

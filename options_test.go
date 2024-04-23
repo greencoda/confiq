@@ -4,17 +4,24 @@ import (
 	"testing"
 
 	"github.com/greencoda/confiq"
+	"github.com/greencoda/confiq/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
 type OptionsTestSuite struct {
 	suite.Suite
+
+	valueContainer *mocks.IValueContainer
 }
 
 func Test_OptionsTestSuite(t *testing.T) {
 	t.Parallel()
 
 	suite.Run(t, new(OptionsTestSuite))
+}
+
+func (s *OptionsTestSuite) SetupTest() {
+	s.valueContainer = mocks.NewIValueContainer(s.T())
 }
 
 func (s *OptionsTestSuite) Test_WithTag() {
@@ -26,7 +33,10 @@ func (s *OptionsTestSuite) Test_WithTag() {
 		confiq.WithTag("alt"),
 	)
 
-	loadErr := configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	var cfg ConfigStruct
@@ -44,7 +54,10 @@ func (s *OptionsTestSuite) Test_WithPrefix() {
 		confiq.WithTag("alt"),
 	)
 
-	loadErr := configSet.LoadJSONFromString(`{"test_string":"test"}`)
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	var cfg ConfigStruct

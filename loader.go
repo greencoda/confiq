@@ -1,10 +1,8 @@
 package confiq
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"maps"
 )
 
@@ -17,14 +15,32 @@ var (
 )
 
 var (
+	errValueCannotBeNil           = errors.New("value cannot be nil")
 	errCannotApplyValueOfThisType = errors.New("cannot apply value of this type")
 	errCannotApplyMapValue        = errors.New("cannot apply map value")
 	errCannotApplySliceValue      = errors.New("cannot apply slice value")
-	errCannotGetBytesFromReader   = errors.New("cannot get bytes from reader")
 )
 
 type loader struct {
 	prefix string
+}
+
+func (c *ConfigSet) Load(valueContainer IValueContainer, options ...loadOption) error {
+	if errs := valueContainer.Errors(); len(errs) > 0 {
+		return fmt.Errorf("%w: %w", ErrCannotLoadConfig, errors.Join(errs...))
+	}
+
+	return c.applyValues(valueContainer.Get(), options...)
+}
+
+// LoadRawValue loads a raw value into the config set.
+// The value must be a map[string]any or a slice of any.
+func (c *ConfigSet) LoadRawValue(newValues []any, options ...loadOption) error {
+	if newValues == nil {
+		return errValueCannotBeNil
+	}
+
+	return c.applyValues(newValues, options...)
 }
 
 func newLoader() *loader {
@@ -33,35 +49,29 @@ func newLoader() *loader {
 	}
 }
 
-func readerToBytes(reader io.Reader) ([]byte, error) {
-	if reader == nil {
-		return []byte{}, errCannotGetBytesFromReader
-	}
-
-	buffer := new(bytes.Buffer)
-
-	if _, err := buffer.ReadFrom(reader); err != nil {
-		return []byte{}, errCannotGetBytesFromReader
-	}
-
-	return buffer.Bytes(), nil
-}
-
-func (c *ConfigSet) applyValue(newValue any, options ...loadOption) error {
+func (c *ConfigSet) applyValues(newValues []any, options ...loadOption) error {
 	loader := newLoader()
 
 	for _, option := range options {
 		option(loader)
 	}
 
-	switch v := newValue.(type) {
-	case map[string]any:
-		return c.applyMap(v, loader.prefix)
-	case []any:
-		return c.applySlice(v, loader.prefix)
+	for _, newValue := range newValues {
+		switch v := newValue.(type) {
+		case map[string]any:
+			if err := c.applyMap(v, loader.prefix); err != nil {
+				return err
+			}
+		case []any:
+			if err := c.applySlice(v, loader.prefix); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("%w: %T", errCannotApplyValueOfThisType, newValue)
+		}
 	}
 
-	return fmt.Errorf("%w: %T", errCannotApplyValueOfThisType, newValue)
+	return nil
 }
 
 func (c *ConfigSet) applyMap(newValue map[string]any, prefix string) error {

@@ -4,13 +4,15 @@ import (
 	"testing"
 
 	"github.com/greencoda/confiq"
+	"github.com/greencoda/confiq/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
 type PrimitiveDecodersTestSuite struct {
 	suite.Suite
 
-	configSet *confiq.ConfigSet
+	configSet      *confiq.ConfigSet
+	valueContainer *mocks.IValueContainer
 }
 
 func Test_PrimitiveDecoders(t *testing.T) {
@@ -23,12 +25,16 @@ func (s *PrimitiveDecodersTestSuite) SetupTest() {
 	s.configSet = confiq.New(
 		confiq.WithTag("cfg"),
 	)
+	s.valueContainer = mocks.NewIValueContainer(s.T())
 
 	s.Require().NotNil(s.T(), s.configSet)
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeString() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -47,7 +53,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeString() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeBool() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -66,7 +75,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeBool() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeBool_FromString() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool_string": "true"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -85,7 +97,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeBool_FromString() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeBool_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool_invalid_format": 1.1}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -100,7 +115,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeBool_FromInvalidFormat() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeFloat64() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_float": 0.1234567890123456}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -137,7 +155,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeFloat_FromFloat32() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeFloat_FromString() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_float_string": "0.1234567890123456"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -156,7 +177,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeFloat_FromString() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeFloat_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_float_invalid_format": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -261,7 +285,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeInt64() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeInt_FromString() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int_string": "64"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -280,7 +307,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeInt_FromString() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeInt_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int_invalid_format": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -385,7 +415,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeUInt64() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeUInt_FromString() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int_string": "64"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -404,7 +437,10 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeUInt_FromString() {
 }
 
 func (s *PrimitiveDecodersTestSuite) Test_DecodeUInt_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_int_invalid_format": true}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {

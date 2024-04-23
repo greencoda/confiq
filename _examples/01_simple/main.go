@@ -9,6 +9,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/greencoda/confiq"
+
+	confiqjson "github.com/greencoda/confiq/loaders/json"
 )
 
 // ConfigSettingAPIGroup is a struct to test the config set.
@@ -39,7 +41,10 @@ func main() {
 	configSet := confiq.New()
 
 	// Load the JSON file into the config set.
-	if err := configSet.LoadJSONFromFile("./config.json"); err != nil {
+	if err := configSet.Load(
+		confiqjson.Load().FromFile("./config.json"),
+		confiq.WithPrefix(""),
+	); err != nil {
 		log.Fatal(err)
 	}
 

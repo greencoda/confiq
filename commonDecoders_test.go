@@ -8,13 +8,15 @@ import (
 	"time"
 
 	"github.com/greencoda/confiq"
+	"github.com/greencoda/confiq/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
 type CommonDecodersTestSuite struct {
 	suite.Suite
 
-	configSet *confiq.ConfigSet
+	configSet      *confiq.ConfigSet
+	valueContainer *mocks.IValueContainer
 }
 
 func Test_CommonDecoders(t *testing.T) {
@@ -27,12 +29,16 @@ func (s *CommonDecodersTestSuite) SetupTest() {
 	s.configSet = confiq.New(
 		confiq.WithTag("cfg"),
 	)
+	s.valueContainer = mocks.NewIValueContainer(s.T())
 
 	s.Require().NotNil(s.configSet)
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Duration() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_duration": "15s"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -51,7 +57,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_Duration() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Duration_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_duration_invalid_format": "fifteen seconds"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -66,7 +75,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_Duration_FromInvalidFormat() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_IP() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_ip": "127.0.0.1"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -85,7 +97,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_IP() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_IP_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_ip_invalid_format": "127.0.0.0.1"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -100,7 +115,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_IP_FromInvalidFormat() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_rawMessage": map[string]any{"rawMessage": "It's raw"}}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -119,7 +137,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage_WithUnmarshalable() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_rawMessage": map[string]any{"rawMessage": "It's raw"}}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -136,7 +157,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage_WithUnmarshalable()
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_URL() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -167,7 +191,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_URL() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_URL_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -182,7 +209,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_URL_FromInvalidFormat() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": "2025-01-13T16:00:00+09:00"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -201,7 +231,12 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time_FromTime() {
-	loadErr := s.configSet.LoadTOMLFromFile("./testdata/common.toml")
+	timeValue := time.Date(2025, 1, 13, 16, 0, 0, 0, time.FixedZone("", 9*60*60))
+
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": timeValue}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -210,7 +245,7 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_FromTime() {
 
 	var (
 		target   targetStruct
-		expected = time.Date(2025, 1, 13, 16, 0, 0, 0, time.FixedZone("", 9*60*60))
+		expected = timeValue
 	)
 
 	decodeErr := s.configSet.Decode(&target)
@@ -220,7 +255,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_FromTime() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time_FromInvalidType() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time_invalid_type": false}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
@@ -235,7 +273,10 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_FromInvalidType() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time_FromInvalidFormat() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/common.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time_invalid_format": "2025. 01. 13. 16:00:00 UTC"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {

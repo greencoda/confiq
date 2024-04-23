@@ -4,13 +4,15 @@ import (
 	"testing"
 
 	"github.com/greencoda/confiq"
+	"github.com/greencoda/confiq/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
 type ConfigSetTestSuite struct {
 	suite.Suite
 
-	configSet *confiq.ConfigSet
+	configSet      *confiq.ConfigSet
+	valueContainer *mocks.IValueContainer
 }
 
 func Test_ConfigSet(t *testing.T) {
@@ -23,12 +25,16 @@ func (s *ConfigSetTestSuite) SetupTest() {
 	s.configSet = confiq.New(
 		confiq.WithTag("cfg"),
 	)
+	s.valueContainer = mocks.NewIValueContainer(s.T())
 
 	s.Require().NotNil(s.T(), s.configSet)
 }
 
 func (s *ConfigSetTestSuite) Test_Decode() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type JSONPrimitives struct {
@@ -46,7 +52,10 @@ func (s *ConfigSetTestSuite) Test_Decode() {
 }
 
 func (s *ConfigSetTestSuite) Test_Decode_NotPointer() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type JSONPrimitives struct {
@@ -62,7 +71,10 @@ func (s *ConfigSetTestSuite) Test_Decode_NotPointer() {
 }
 
 func (s *ConfigSetTestSuite) Test_Decode_KeySegmentIndex() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type JSONPrimitives struct {
@@ -80,7 +92,10 @@ func (s *ConfigSetTestSuite) Test_Decode_KeySegmentIndex() {
 }
 
 func (s *ConfigSetTestSuite) Test_StrictDecode() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type JSONPrimitives struct {
@@ -98,7 +113,10 @@ func (s *ConfigSetTestSuite) Test_StrictDecode() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_Primitives() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("test_string")
@@ -108,7 +126,14 @@ func (s *ConfigSetTestSuite) Test_Get_Primitives() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_NestedPrimitives() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/composite.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{"test_section": map[string]any{
+			"test_string_array": []any{"aleph", "beth", "gimel"},
+		}},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("test_section.test_string_array[0]")
@@ -118,7 +143,10 @@ func (s *ConfigSetTestSuite) Test_Get_NestedPrimitives() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_FromMap_WithInvalidKeyPath() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("noexistent_key")
@@ -128,7 +156,10 @@ func (s *ConfigSetTestSuite) Test_Get_FromMap_WithInvalidKeyPath() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_FromMap_WithInvalidIndexPath() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/primitive.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("[0]")
@@ -138,7 +169,16 @@ func (s *ConfigSetTestSuite) Test_Get_FromMap_WithInvalidIndexPath() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_FromArray_WithInvalidKeyPath() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/array.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		[]any{
+			map[string]any{"test_value": "test_1"},
+			map[string]any{"test_value": "test_2"},
+			map[string]any{"test_value": "test_3"},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("noexistent_key")
@@ -148,7 +188,16 @@ func (s *ConfigSetTestSuite) Test_Get_FromArray_WithInvalidKeyPath() {
 }
 
 func (s *ConfigSetTestSuite) Test_Get_FromArray_WithInvalidIndexPath() {
-	loadErr := s.configSet.LoadJSONFromFile("./testdata/array.json")
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		[]any{
+			map[string]any{"test_value": "test_1"},
+			map[string]any{"test_value": "test_2"},
+			map[string]any{"test_value": "test_3"},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	value, getErr := s.configSet.Get("[-1]")

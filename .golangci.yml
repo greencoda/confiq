@@ -16,6 +16,8 @@ linters:
   - varnamelen
 
 linters-settings:
+  asasalint:
+    ignore-test: true
   cyclop:
     max-complexity: 20
   depguard:

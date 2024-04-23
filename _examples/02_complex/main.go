@@ -6,6 +6,11 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/greencoda/confiq"
+
+	confiqenv "github.com/greencoda/confiq/loaders/env"
+	confiqjson "github.com/greencoda/confiq/loaders/json"
+	confiqtoml "github.com/greencoda/confiq/loaders/toml"
+	confiqyaml "github.com/greencoda/confiq/loaders/yaml"
 )
 
 // APISettings is a struct which holds the API settings.
@@ -46,22 +51,22 @@ func main() {
 	configSet := confiq.New()
 
 	// Load the API settings from a TOML file into the config set, with a prefix of "apiSettings".
-	if err := configSet.LoadTOMLFromFile("./apiSettings.toml", confiq.WithPrefix("apiSettings")); err != nil {
+	if err := configSet.Load(confiqtoml.Load().FromFile("./apiSettings.toml"), confiq.WithPrefix("apiSettings")); err != nil {
 		log.Fatal(err)
 	}
 
 	// Load the DB settings from a JSON file into the config set.
-	if err := configSet.LoadJSONFromFile("./dbSettings.json", confiq.WithPrefix("dbSettings")); err != nil {
+	if err := configSet.Load(confiqjson.Load().FromFile("./dbSettings.json"), confiq.WithPrefix("dbSettings")); err != nil {
 		log.Fatal(err)
 	}
 
-	// Load the DB settings from an Env file into the config set.
-	if err := configSet.LoadEnvFromFile("./osSettings.env", confiq.WithPrefix("osSettings")); err != nil {
+	// Load the OS settings from an Env file into the config set.
+	if err := configSet.Load(confiqenv.Load().FromFile("./osSettings.env"), confiq.WithPrefix("apiSettings")); err != nil {
 		log.Fatal(err)
 	}
 
-	// Load the DB settings from a YAML file into the config set.
-	if err := configSet.LoadYAMLFromFile("./userSettings.yaml", confiq.WithPrefix("userSettings")); err != nil {
+	// Load the User settings from a YAML file into the config set.
+	if err := configSet.Load(confiqyaml.Load().FromFile("./userSettings.yaml"), confiq.WithPrefix("userSettings")); err != nil {
 		log.Fatal(err)
 	}
 

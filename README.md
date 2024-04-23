@@ -1,7 +1,7 @@
 [![godoc for greencoda/confiq][godoc-badge]][godoc-url]
 [![Go 1.22][goversion-badge]][goversion-url]
 [![Build Status][actions-badge]][actions-url]
-[![Go Coverage](https://github.com/greencoda/confiq/wiki/coverage.svg)](https://raw.githack.com/wiki/greencoda/confiq/coverage.html)
+[![Go Coverage][gocoverage-badge]][gocoverage-url]
 [![Go Report card][goreportcard-badge]][goreportcard-url]
 
 <p align="center"><img src=".github/splash_image.png" width="500"></p>
@@ -45,7 +45,9 @@ In this example we're loading it from the file system:
 ``` go
 configSet := confiq.New()
 
-if err := configSet.LoadJSONFromFile("./config.json"); err != nil {
+if err := configSet.Load(
+    confiqjson.Load().FromFile("./config.json"),
+); err != nil {
     log.Fatal(err)
 }
 ```
@@ -169,3 +171,5 @@ func (t *customType) Decode(value any) error {
 [goversion-url]: https://golang.org/doc/go1.22
 [goreportcard-badge]: https://goreportcard.com/badge/github.com/greencoda/confiq
 [goreportcard-url]: https://goreportcard.com/report/github.com/greencoda/confiq
+[gocoverage-badge]: https://github.com/greencoda/confiq/wiki/coverage.svg
+[gocoverage-url]: https://raw.githack.com/wiki/greencoda/confiq/coverage.html
