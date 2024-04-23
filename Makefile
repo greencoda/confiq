@@ -15,14 +15,9 @@ mocks:
 	mockery
 
 test:
-	go test ${TESTABLE_PACKAGES} -count=1 -cover 
+	go test ${TESTABLE_PACKAGES} -count=1 -cover -coverprofile=coverage.out
 
 test-cover:
 	go test ${TESTABLE_PACKAGES} -count=1 -cover -coverprofile=coverage.out
 	go tool cover -html=coverage.out
-
-test-loaders:
-	(for dir in ./loaders/*/; do \
-		(cd $$dir;go test ./... -count=1 -cover -coverprofile=coverage.out) \
-	done)
 	
