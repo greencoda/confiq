@@ -192,7 +192,7 @@ func (s *CommonDecodersTestSuite) Test_Decode_URL() {
 
 func (s *CommonDecodersTestSuite) Test_Decode_URL_FromInvalidFormat() {
 	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url_invalid_format": "missing_protocol://test.com"}})
 
 	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)

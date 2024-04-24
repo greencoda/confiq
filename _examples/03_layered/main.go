@@ -56,7 +56,7 @@ func main() {
 	var cfg ConfigStruct
 
 	// Decode the config set into the ConfigStruct instance.
-	if err := configSet.StrictDecode(&cfg); err != nil {
+	if err := configSet.Decode(&cfg, confiq.AsStrict()); err != nil {
 		log.Fatal(err)
 	}
 

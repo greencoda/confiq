@@ -17,3 +17,19 @@ func WithPrefix(prefix string) loadOption {
 		l.prefix = prefix
 	}
 }
+
+type decodeOption func(*decodeSettings)
+
+// AsStrict sets the decoder to decode the configuration values as if all fields are set to strict.
+func AsStrict() decodeOption {
+	return func(d *decodeSettings) {
+		d.strict = true
+	}
+}
+
+// FromPrefix sets the prefix to be used when decoding configuration values into the target struct.
+func FromPrefix(prefix string) decodeOption {
+	return func(d *decodeSettings) {
+		d.prefix = prefix
+	}
+}

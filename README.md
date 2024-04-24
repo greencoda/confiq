@@ -80,10 +80,10 @@ if err := configSet.Decode(&config); err != nil {
 }
 ```
 
-You may also use `StrictDecode` to have all fields act as if they were `strict`:
+You may also use `confiq.AsStrict()` option to have all fields act as if they were `strict`:
 
 ``` go
-if err := configSet.StrictDecode(&config); err != nil {
+if err := configSet.Decode(&config, confiq.AsStrict()); err != nil {
    // ...
 }
 ```

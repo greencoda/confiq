@@ -3,7 +3,6 @@ package confiq_test
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"strconv"
 	"testing"
 
@@ -568,22 +567,4 @@ func (s *DecodeTestSuite) Test_Decode_EmptyTag() {
 
 	s.Equal(expected, target.TestStruct.TestString)
 	s.NoError(decodeErr)
-}
-
-func (s *DecodeTestSuite) Test_StrictDecode() {
-	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url_invalid_format": "missing_protocol://test.com"}})
-
-	loadErr := s.configSet.Load(s.valueContainer)
-	s.Require().NoError(loadErr)
-
-	type targetStruct struct {
-		TestString *url.URL `cfg:"test_url_invalid_format"`
-	}
-
-	var target targetStruct
-
-	decodeErr := s.configSet.StrictDecode(&target)
-
-	s.Error(decodeErr)
 }

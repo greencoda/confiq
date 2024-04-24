@@ -2,6 +2,7 @@ package confiq_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/greencoda/confiq"
 	"github.com/greencoda/confiq/mocks"
@@ -26,7 +27,7 @@ func (s *OptionsTestSuite) SetupTest() {
 
 func (s *OptionsTestSuite) Test_WithTag() {
 	type ConfigStruct struct {
-		String string `cfg:"test_string"`
+		TestString string `cfg:"test_string"`
 	}
 
 	configSet := confiq.New(
@@ -47,12 +48,10 @@ func (s *OptionsTestSuite) Test_WithTag() {
 
 func (s *OptionsTestSuite) Test_WithPrefix() {
 	type ConfigStruct struct {
-		String string `alt:"test_string"`
+		TestString string `cfg:"test_string"`
 	}
 
-	configSet := confiq.New(
-		confiq.WithTag("alt"),
-	)
+	configSet := confiq.New()
 
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
@@ -63,5 +62,45 @@ func (s *OptionsTestSuite) Test_WithPrefix() {
 	var cfg ConfigStruct
 
 	decodeErr := configSet.Decode(&cfg)
+	s.NoError(decodeErr)
+}
+
+func (s *OptionsTestSuite) Test_AsStrict() {
+	type ConfigStruct struct {
+		TestString   string        `cfg:"test_string"`
+		TestDuration time.Duration `cfg:"test_duration"`
+	}
+
+	configSet := confiq.New()
+
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test", "test_duration": "one hour"}})
+
+	loadErr := configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	var cfg ConfigStruct
+
+	decodeErr := configSet.Decode(&cfg, confiq.AsStrict())
+
+	s.Error(decodeErr)
+}
+
+func (s *OptionsTestSuite) Test_FromPrefix() {
+	type ConfigStruct struct {
+		TestString string `cfg:"test_string"`
+	}
+
+	configSet := confiq.New()
+
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_struct": map[string]any{"test_string": "test"}}})
+
+	loadErr := configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	var cfg ConfigStruct
+
+	decodeErr := configSet.Decode(&cfg, confiq.FromPrefix("test_struct"))
 	s.NoError(decodeErr)
 }

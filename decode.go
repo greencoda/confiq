@@ -115,7 +115,7 @@ func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOption
 				return 0, fmt.Errorf("error decoding field value: %w", err)
 			}
 
-			return 0, err
+			return 0, nil
 		}
 
 		return 1, nil

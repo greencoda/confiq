@@ -91,27 +91,6 @@ func (s *ConfigSetTestSuite) Test_Decode_KeySegmentIndex() {
 	s.NoError(decodeErr)
 }
 
-func (s *ConfigSetTestSuite) Test_StrictDecode() {
-	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})
-
-	loadErr := s.configSet.Load(s.valueContainer)
-	s.Require().NoError(loadErr)
-
-	type JSONPrimitives struct {
-		TestString string `cfg:"test_string"`
-	}
-
-	var jsonPrimitives JSONPrimitives
-
-	decodeErr := s.configSet.StrictDecode(&jsonPrimitives)
-
-	s.Equal(JSONPrimitives{
-		TestString: "test",
-	}, jsonPrimitives)
-	s.NoError(decodeErr)
-}
-
 func (s *ConfigSetTestSuite) Test_Get_Primitives() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_string": "test"}})

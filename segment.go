@@ -28,7 +28,7 @@ func (kS keySegment) asString() string {
 type indexSegment int
 
 func (iS indexSegment) String() string {
-	return "[" + strconv.Itoa(int(iS)) + "]"
+	return openBraceChar + strconv.Itoa(int(iS)) + closeBraceChar
 }
 
 func (iS indexSegment) asInt() int {

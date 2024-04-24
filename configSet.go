@@ -20,6 +20,11 @@ type decoder struct {
 	tag string
 }
 
+type decodeSettings struct {
+	strict bool
+	prefix string
+}
+
 // ConfigSet is a configuration set that can be used to load and decode configuration values into a struct.
 type ConfigSet struct {
 	value   *any
@@ -44,13 +49,17 @@ func New(options ...configSetOption) *ConfigSet {
 }
 
 // Decode decodes the configuration values into the target struct.
-func (c *ConfigSet) Decode(target interface{}) error {
-	return c.decode(target, "", false)
-}
+func (c *ConfigSet) Decode(target interface{}, options ...decodeOption) error {
+	decodeOptions := &decodeSettings{
+		strict: false,
+		prefix: "",
+	}
 
-// StrictDecode decodes the configuration values into the target, as if all fields are set to struct.
-func (c *ConfigSet) StrictDecode(target interface{}) error {
-	return c.decode(target, "", true)
+	for _, option := range options {
+		option(decodeOptions)
+	}
+
+	return c.decode(target, decodeOptions.prefix, decodeOptions.strict)
 }
 
 // Get returns the configuration value at the given path as an interface.
