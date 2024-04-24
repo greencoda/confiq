@@ -13,8 +13,8 @@ import (
 
 // ServiceSettings is a struct to test the config set.
 type ServiceSettings struct {
-	URL     *url.URL      `cfg:"url"`
-	Timeout time.Duration `cfg:"timeout"`
+	URL     *url.URL      `cfg:"url,default=https://default-service-url.com"`
+	Timeout time.Duration `cfg:"timeout,default=45s"`
 }
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	var (
 		birthdayService ServiceSettings
 		addressService  ServiceSettings
-		parcelService   ServiceSettings
+		missingService  ServiceSettings
 	)
 
 	// Decode the birthday service settings from the config set.
@@ -47,10 +47,10 @@ func main() {
 	}
 
 	// Decode the parcel service settings from the config set.
-	if err := configSet.Decode(&parcelService, confiq.FromPrefix("parcel_service")); err != nil {
+	if err := configSet.Decode(&missingService, confiq.FromPrefix("missing_service")); err != nil {
 		log.Fatal(err)
 	}
 
 	// Print the decoded service settings.
-	spew.Dump(birthdayService, addressService, parcelService)
+	spew.Dump(birthdayService, addressService, missingService)
 }

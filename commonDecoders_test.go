@@ -56,6 +56,24 @@ func (s *CommonDecodersTestSuite) Test_Decode_Duration() {
 	s.NoError(decodeErr)
 }
 
+func (s *CommonDecodersTestSuite) Test_Decode_Duration_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_duration": nil}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestDuration time.Duration `cfg:"test_duration"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
+}
+
 func (s *CommonDecodersTestSuite) Test_Decode_Duration_FromInvalidFormat() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_duration_invalid_format": "fifteen seconds"}})
@@ -94,6 +112,24 @@ func (s *CommonDecodersTestSuite) Test_Decode_IP() {
 
 	s.Equal(expected, target.TestIP)
 	s.NoError(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_IP_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_ip": nil}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestIP net.IP `cfg:"test_ip"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_IP_FromInvalidFormat() {
@@ -136,6 +172,24 @@ func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage() {
 	s.NoError(decodeErr)
 }
 
+func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_rawMessage": nil}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestRawMessage json.RawMessage `cfg:"test_rawMessage"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
+}
+
 func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage_WithUnmarshalable() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_rawMessage": map[string]any{"rawMessage": "It's raw"}}})
@@ -150,58 +204,6 @@ func (s *CommonDecodersTestSuite) Test_Decode_JSONRawMessage_WithUnmarshalable()
 	var target targetStruct
 
 	s.configSet.OverrideValue(map[string]any{"test_rawMessage": map[bool]string{true: "It's raw"}})
-
-	decodeErr := s.configSet.Decode(&target)
-
-	s.Error(decodeErr)
-}
-
-func (s *CommonDecodersTestSuite) Test_Decode_URL() {
-	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
-
-	loadErr := s.configSet.Load(s.valueContainer)
-	s.Require().NoError(loadErr)
-
-	type targetStruct struct {
-		TestURL *url.URL `cfg:"test_url"`
-	}
-
-	var (
-		target   targetStruct
-		expected = &url.URL{
-			Scheme:      "http",
-			Opaque:      "",
-			User:        nil,
-			Host:        "www.test.com",
-			Path:        "",
-			RawPath:     "",
-			OmitHost:    false,
-			ForceQuery:  false,
-			RawQuery:    "",
-			Fragment:    "",
-			RawFragment: "",
-		}
-	)
-
-	decodeErr := s.configSet.Decode(&target)
-
-	s.Equal(expected, target.TestURL)
-	s.NoError(decodeErr)
-}
-
-func (s *CommonDecodersTestSuite) Test_Decode_URL_FromInvalidFormat() {
-	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url_invalid_format": "missing_protocol://test.com"}})
-
-	loadErr := s.configSet.Load(s.valueContainer)
-	s.Require().NoError(loadErr)
-
-	type targetStruct struct {
-		TestURL *url.URL `cfg:"test_url_invalid_format"`
-	}
-
-	var target targetStruct
 
 	decodeErr := s.configSet.Decode(&target)
 
@@ -228,6 +230,24 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time() {
 
 	s.Equal(expected, target.TestTime)
 	s.NoError(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_Time_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": nil}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestTime time.Time `cfg:"test_time"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time_FromTime() {
@@ -281,6 +301,76 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_FromInvalidFormat() {
 
 	type targetStruct struct {
 		TestTime time.Time `cfg:"test_time_invalid_format"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_URL() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestURL *url.URL `cfg:"test_url"`
+	}
+
+	var (
+		target   targetStruct
+		expected = &url.URL{
+			Scheme:      "http",
+			Opaque:      "",
+			User:        nil,
+			Host:        "www.test.com",
+			Path:        "",
+			RawPath:     "",
+			OmitHost:    false,
+			ForceQuery:  false,
+			RawQuery:    "",
+			Fragment:    "",
+			RawFragment: "",
+		}
+	)
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Equal(expected, target.TestURL)
+	s.NoError(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_URL_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": nil}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestURL *url.URL `cfg:"test_url"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_URL_FromInvalidFormat() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url_invalid_format": "missing_protocol://test.com"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestURL *url.URL `cfg:"test_url_invalid_format"`
 	}
 
 	var target targetStruct

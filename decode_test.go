@@ -540,7 +540,7 @@ func (s *DecodeTestSuite) Test_Decode_MissingField() {
 
 	decodeErr := s.configSet.Decode(&target)
 
-	s.Error(decodeErr)
+	s.NoError(decodeErr)
 }
 
 func (s *DecodeTestSuite) Test_Decode_EmptyTag() {

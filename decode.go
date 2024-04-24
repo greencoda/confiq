@@ -63,12 +63,13 @@ func (c *ConfigSet) decode(target interface{}, options []decodeOption) error {
 
 	targetValue = targetValue.Elem()
 
-	if decodedFieldCount, err := c.decodeField(targetValue, fieldOptions{
+	decodedFieldCount, err := c.decodeField(targetValue, fieldOptions{
 		path:         decodeSettings.prefix,
 		strict:       decodeSettings.strict,
 		required:     false,
 		defaultValue: nil,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	} else if decodedFieldCount == 0 {
 		return ErrNoTargetFieldsAreSet
@@ -101,11 +102,9 @@ func (c *ConfigSet) getFieldConfigValue(fieldOpts fieldOptions) (any, error) {
 func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOptions) (int, error) {
 	fieldConfigValue, err := c.getFieldConfigValue(fieldOpts)
 	if err != nil {
-		if errors.Is(err, errCannotDecodeNonRequiredField) {
-			return 0, nil
+		if !errors.Is(err, errCannotDecodeNonRequiredField) {
+			return 0, err
 		}
-
-		return 0, err
 	}
 
 	var (

@@ -1,14 +1,10 @@
 {
     "birthday_service": {
         "url": "http://happy-birthday-app.io/api/v1",
-        "timeout": "15s"
+        "timeout": "5s"
     },
     "address_service": {
         "url": "http://yellow-page-service.net/api",
-        "timeout": "30s"
-    },
-    "parcel_service": {
-        "url": "https://teleport-service.intergalactica.com/services/api/v1",
-        "timeout": "60s"
+        "timeout": "15s"
     }
 }
