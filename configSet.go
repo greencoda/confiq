@@ -48,20 +48,6 @@ func New(options ...configSetOption) *ConfigSet {
 	return configSet
 }
 
-// Decode decodes the configuration values into the target struct.
-func (c *ConfigSet) Decode(target interface{}, options ...decodeOption) error {
-	decodeOptions := &decodeSettings{
-		strict: false,
-		prefix: "",
-	}
-
-	for _, option := range options {
-		option(decodeOptions)
-	}
-
-	return c.decode(target, decodeOptions.prefix, decodeOptions.strict)
-}
-
 // Get returns the configuration value at the given path as an interface.
 func (c *ConfigSet) Get(path string) (any, error) {
 	return c.getByPath(path)

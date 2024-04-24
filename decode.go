@@ -37,20 +37,25 @@ type fieldOptions struct {
 	defaultValue *string
 }
 
-func newEmptyFieldOptions() fieldOptions {
-	return fieldOptions{
-		path:         "",
-		strict:       false,
-		required:     false,
-		defaultValue: nil,
-	}
-}
-
 type Decoder interface {
 	Decode(value any) error
 }
 
-func (c *ConfigSet) decode(target interface{}, path string, strict bool) error {
+// Decode decodes the configuration values into the target struct.
+func (c *ConfigSet) Decode(target interface{}, options ...decodeOption) error {
+	return c.decode(target, options)
+}
+
+func (c *ConfigSet) decode(target interface{}, options []decodeOption) error {
+	decodeSettings := &decodeSettings{
+		strict: false,
+		prefix: "",
+	}
+
+	for _, option := range options {
+		option(decodeSettings)
+	}
+
 	targetValue := reflect.ValueOf(target)
 	if targetValue.Kind() != reflect.Ptr || targetValue.IsNil() {
 		return ErrInvalidTarget
@@ -59,8 +64,8 @@ func (c *ConfigSet) decode(target interface{}, path string, strict bool) error {
 	targetValue = targetValue.Elem()
 
 	if decodedFieldCount, err := c.decodeField(targetValue, fieldOptions{
-		path:         path,
-		strict:       strict,
+		path:         decodeSettings.prefix,
+		strict:       decodeSettings.strict,
 		required:     false,
 		defaultValue: nil,
 	}); err != nil {
@@ -330,20 +335,21 @@ func (c *ConfigSet) decodePrimitiveType(primitiveValue reflect.Value, configValu
 }
 
 func (c *ConfigSet) readTag(field reflect.StructField, tag string) fieldOptions {
-	tagValue := field.Tag.Get(tag)
-	if tagValue == "" {
-		return newEmptyFieldOptions()
+	fieldOpts := fieldOptions{
+		path:         "",
+		strict:       false,
+		required:     false,
+		defaultValue: nil,
 	}
 
-	var (
-		tagParts  = strings.Split(tagValue, ",")
-		fieldOpts = fieldOptions{
-			path:         tagParts[0],
-			strict:       false,
-			required:     false,
-			defaultValue: nil,
-		}
-	)
+	tagValue := field.Tag.Get(tag)
+	if tagValue == "" {
+		return fieldOpts
+	}
+
+	tagParts := strings.Split(tagValue, ",")
+
+	fieldOpts.path = tagParts[0]
 
 	// read the remaining tag parts
 	for _, part := range tagParts[1:] {
