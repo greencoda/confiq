@@ -3,6 +3,7 @@
 [![Build Status][actions-badge]][actions-url]
 [![Go Coverage][gocoverage-badge]][gocoverage-url]
 [![Go Report card][goreportcard-badge]][goreportcard-url]
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go?tab=readme-ov-file#configuration)  
 
 <p align="center"><img src=".github/splash_image.png" width="500"></p>
 
