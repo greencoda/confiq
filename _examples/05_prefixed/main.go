@@ -33,7 +33,7 @@ func main() {
 	var (
 		birthdayService ServiceSettings
 		addressService  ServiceSettings
-		missingService  ServiceSettings
+		parcelService   ServiceSettings
 	)
 
 	// Decode the birthday service settings from the config set.
@@ -46,11 +46,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Decode the parcel service settings from the config set.
-	if err := configSet.Decode(&missingService, confiq.FromPrefix("missing_service")); err != nil {
+	// Decode the parcel service settings from the config set. Note that this is not specified so it will fallback to the default values.
+	if err := configSet.Decode(&parcelService, confiq.FromPrefix("parcel_service")); err != nil {
 		log.Fatal(err)
 	}
 
 	// Print the decoded service settings.
-	spew.Dump(birthdayService, addressService, missingService)
+	spew.Dump(birthdayService, addressService, parcelService)
 }

@@ -114,27 +114,14 @@ func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOption
 	)
 
 	if commonDecoder := getCommonDecoder(targetValue.Type()); commonDecoder != nil {
-		// Handle pointer types
-		for targetValue.Kind() == reflect.Ptr {
-			if targetValue.IsNil() {
-				targetValue.Set(reflect.New(targetValue.Type().Elem()))
-			}
-
-			targetValue = targetValue.Elem()
-		}
-
-		if err := commonDecoder(targetValue, fieldConfigValue); err != nil {
-			if fieldOpts.strict {
-				return 0, fmt.Errorf("error decoding field value: %w", err)
-			}
-
-			return 0, nil
-		}
-
-		return 1, nil
+		return c.decodeCommon(commonDecoder, targetValue, fieldConfigValue, fieldOpts.strict)
 	}
 
 	if targetValue.Kind() == reflect.Ptr {
+		if fieldConfigValue == nil {
+			return 0, nil
+		}
+
 		dereferencedTargetValue := reflect.New(targetValue.Type().Elem()).Elem()
 
 		decodedFields, err := c.decodeField(dereferencedTargetValue, fieldOpts)
@@ -177,6 +164,30 @@ func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOption
 	}
 
 	return decodedFields, nil
+}
+
+func (c *ConfigSet) decodeCommon(commonDecoder decoderFunc, targetValue reflect.Value, fieldConfigValue any, strict bool) (int, error) {
+	for targetValue.Kind() == reflect.Ptr {
+		if fieldConfigValue == nil {
+			return 0, nil
+		}
+
+		if targetValue.IsNil() {
+			targetValue.Set(reflect.New(targetValue.Type().Elem()))
+		}
+
+		targetValue = targetValue.Elem()
+	}
+
+	if err := commonDecoder(targetValue, fieldConfigValue); err != nil {
+		if strict {
+			return 0, fmt.Errorf("error decoding field value: %w", err)
+		}
+
+		return 0, nil
+	}
+
+	return 1, nil
 }
 
 func (c *ConfigSet) decodeMap(targetMapValue reflect.Value, configValue any, strict bool) (int, error) {
@@ -392,10 +403,18 @@ func (c *ConfigSet) subValue(value any) *ConfigSet {
 }
 
 func castToBytes(value any) []byte {
+	if value == nil {
+		return nil
+	}
+
 	return []byte(castToString(value))
 }
 
 func castToString(value any) string {
+	if value == nil {
+		return ""
+	}
+
 	if stringValue, ok := value.(string); ok {
 		return stringValue
 	}

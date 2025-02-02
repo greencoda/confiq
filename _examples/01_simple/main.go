@@ -15,8 +15,9 @@ import (
 
 // ConfigSettingAPIGroup is a struct to test the config set.
 type ConfigSettingAPIGroup struct {
-	URL     *url.URL      `cfg:"url"`
-	Timeout time.Duration `cfg:"timeout"`
+	URL       *url.URL      `cfg:"url"`
+	BackupURL *url.URL      `cfg:"backupuUrl"`
+	Timeout   time.Duration `cfg:"timeout"`
 }
 
 // ConfigStruct is a struct to test the config set.
@@ -28,8 +29,10 @@ type ConfigStruct struct {
 	SettingIP              net.IP                  `cfg:"settingIP"`
 	SettingPointer         *string                 `cfg:"settingPointer"`
 	SettingCount           int                     `cfg:"settingCount"`
+	SettingOptional        *string                 `cfg:"settingOptional"`
 	SettingEnabled         bool                    `cfg:"settingEnabled,required"`
 	SettingExpiration      time.Time               `cfg:"settingExpiration"`
+	SettingOptionalTime    *time.Time              `cfg:"srttingOptionalTime"`
 	SettingAPIGroup        ConfigSettingAPIGroup   `cfg:"settingAPIGroup"`
 	DatabaseDNS            string                  `cfg:"settingDBGroup.dns"`
 	DatabaseMaxConnections int                     `cfg:"settingDBGroup.maxConnections"`

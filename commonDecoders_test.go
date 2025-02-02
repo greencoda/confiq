@@ -234,13 +234,14 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time() {
 
 func (s *CommonDecodersTestSuite) Test_Decode_Time_Ptr() {
 	s.valueContainer.On("Errors").Return([]error{})
-	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": "2025-01-13T16:00:00+09:00"}})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time_a": "2025-01-13T16:00:00+09:00"}})
 
 	loadErr := s.configSet.Load(s.valueContainer)
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
-		TestTime *time.Time `cfg:"test_time"`
+		TestTimeA *time.Time `cfg:"test_time_a"`
+		TestTimeB *time.Time `cfg:"test_time_b"`
 	}
 
 	var (
@@ -250,8 +251,9 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_Ptr() {
 
 	decodeErr := s.configSet.Decode(&target)
 
-	s.Require().NotNil(target.TestTime)
-	s.Equal(expected, *target.TestTime)
+	s.Require().NotNil(target.TestTimeA)
+	s.Equal(expected, *target.TestTimeA)
+	s.Nil(target.TestTimeB)
 	s.NoError(decodeErr)
 }
 
@@ -333,7 +335,7 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time_FromInvalidFormat() {
 	s.Error(decodeErr)
 }
 
-func (s *CommonDecodersTestSuite) Test_Decode_URL() {
+func (s *CommonDecodersTestSuite) Test_Decode_URL_Ptr() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": "http://www.test.com"}})
 
@@ -368,6 +370,24 @@ func (s *CommonDecodersTestSuite) Test_Decode_URL() {
 }
 
 func (s *CommonDecodersTestSuite) Test_Decode_URL_FromNil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestURL url.URL `cfg:"test_url"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Error(decodeErr)
+}
+
+func (s *CommonDecodersTestSuite) Test_Decode_URL_Ptr_FromNil() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_url": nil}})
 

@@ -33,6 +33,14 @@ func (o *unmarshalerNumber) UnmarshalText(raw []byte) error {
 	return nil
 }
 
+type unmarshalerString string
+
+func (o *unmarshalerString) UnmarshalText(raw []byte) error {
+	*o = unmarshalerString(raw)
+
+	return nil
+}
+
 type customDecoderStruct struct {
 	InternalValue string
 }
@@ -367,17 +375,20 @@ func (s *DecodeTestSuite) Test_Decode_TextUnmarshalablePrimitive() {
 	s.Require().NoError(loadErr)
 
 	type targetStruct struct {
-		TestInt unmarshalerNumber `cfg:"test_int_string"`
+		TestIntA unmarshalerNumber `cfg:"test_int_string"`
+		TestIntB unmarshalerString `cfg:"test_string"`
 	}
 
 	var (
-		target   targetStruct
-		expected = unmarshalerNumber(64)
+		target    targetStruct
+		expectedA = unmarshalerNumber(64)
+		expectedB = unmarshalerString("")
 	)
 
 	decodeErr := s.configSet.Decode(&target)
 
-	s.Equal(expected, target.TestInt)
+	s.Equal(expectedA, target.TestIntA)
+	s.Equal(expectedB, target.TestIntB)
 	s.NoError(decodeErr)
 }
 

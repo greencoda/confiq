@@ -75,6 +75,25 @@ func (s *PrimitiveDecodersTestSuite) Test_DecodeString_Ptr() {
 	s.NoError(decodeErr)
 }
 
+func (s *PrimitiveDecodersTestSuite) Test_DecodeString_Ptr_Nil() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestString *string `cfg:"test_string"`
+	}
+
+	var target targetStruct
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Nil(target.TestString)
+	s.Error(decodeErr)
+}
+
 func (s *PrimitiveDecodersTestSuite) Test_DecodeBool() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_bool": true}})

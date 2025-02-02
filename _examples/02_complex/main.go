@@ -61,7 +61,7 @@ func main() {
 	}
 
 	// Load the OS settings from an Env file into the config set.
-	if err := configSet.Load(confiqenv.Load().FromFile("./osSettings.env"), confiq.WithPrefix("apiSettings")); err != nil {
+	if err := configSet.Load(confiqenv.Load().FromFile("./osSettings.env"), confiq.WithPrefix("osSettings")); err != nil {
 		log.Fatal(err)
 	}
 
