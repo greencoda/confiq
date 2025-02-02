@@ -114,6 +114,15 @@ func (c *ConfigSet) decodeField(targetValue reflect.Value, fieldOpts fieldOption
 	)
 
 	if commonDecoder := getCommonDecoder(targetValue.Type()); commonDecoder != nil {
+		// Handle pointer types
+		for targetValue.Kind() == reflect.Ptr {
+			if targetValue.IsNil() {
+				targetValue.Set(reflect.New(targetValue.Type().Elem()))
+			}
+
+			targetValue = targetValue.Elem()
+		}
+
 		if err := commonDecoder(targetValue, fieldConfigValue); err != nil {
 			if fieldOpts.strict {
 				return 0, fmt.Errorf("error decoding field value: %w", err)

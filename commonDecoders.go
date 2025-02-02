@@ -131,7 +131,7 @@ func decodeURL(targetValue reflect.Value, sourceValue any) error {
 		return fmt.Errorf("%w: %w", errCannotParseURL, err)
 	}
 
-	targetValue.Set(reflect.ValueOf(parsedURL))
+	targetValue.Set(reflect.ValueOf(*parsedURL))
 
 	return nil
 }

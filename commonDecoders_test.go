@@ -232,6 +232,29 @@ func (s *CommonDecodersTestSuite) Test_Decode_Time() {
 	s.NoError(decodeErr)
 }
 
+func (s *CommonDecodersTestSuite) Test_Decode_Time_Ptr() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": "2025-01-13T16:00:00+09:00"}})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetStruct struct {
+		TestTime *time.Time `cfg:"test_time"`
+	}
+
+	var (
+		target   targetStruct
+		expected = time.Date(2025, 1, 13, 16, 0, 0, 0, time.FixedZone("", 9*60*60))
+	)
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Require().NotNil(target.TestTime)
+	s.Equal(expected, *target.TestTime)
+	s.NoError(decodeErr)
+}
+
 func (s *CommonDecodersTestSuite) Test_Decode_Time_FromNil() {
 	s.valueContainer.On("Errors").Return([]error{})
 	s.valueContainer.On("Get").Return([]any{map[string]any{"test_time": nil}})

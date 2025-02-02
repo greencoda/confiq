@@ -24,6 +24,10 @@ func (o *unmarshalerNumber) UnmarshalText(raw []byte) error {
 		return fmt.Errorf("%w: %w", errCannotParseInt, err)
 	}
 
+	if n < 0 || n > 255 {
+		return fmt.Errorf("%w: value out of range for uint8", errCannotParseInt)
+	}
+
 	*o = unmarshalerNumber(n)
 
 	return nil
@@ -194,6 +198,56 @@ func (s *DecodeTestSuite) Test_Decode_Map() {
 			"test_map_key_1": 1,
 			"test_map_key_2": 2,
 			"test_map_key_3": 3,
+		}
+	)
+
+	decodeErr := s.configSet.Decode(&target)
+
+	s.Equal(expected, target.TestMap)
+	s.NoError(decodeErr)
+}
+
+func (s *DecodeTestSuite) Test_Decode_StructMap() {
+	s.valueContainer.On("Errors").Return([]error{})
+	s.valueContainer.On("Get").Return([]any{
+		map[string]any{
+			"test_map": map[string]any{
+				"test_map_key_1": map[string]any{
+					"test_int": 1,
+				},
+				"test_map_key_2": map[string]any{
+					"test_int": 2,
+				},
+				"test_map_key_3": map[string]any{
+					"test_int": 3,
+				},
+			},
+		},
+	})
+
+	loadErr := s.configSet.Load(s.valueContainer)
+	s.Require().NoError(loadErr)
+
+	type targetSubStruct struct {
+		TestInt int `cfg:"test_int"`
+	}
+
+	type targetStruct struct {
+		TestMap map[string]targetSubStruct `cfg:"test_map"`
+	}
+
+	var (
+		target   targetStruct
+		expected = map[string]targetSubStruct{
+			"test_map_key_1": {
+				TestInt: 1,
+			},
+			"test_map_key_2": {
+				TestInt: 2,
+			},
+			"test_map_key_3": {
+				TestInt: 3,
+			},
 		}
 	)
 
