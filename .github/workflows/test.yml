@@ -51,7 +51,6 @@ jobs:
         report: true
         chart: true
         amend: true
-        reuse-go: true
       if: |
         github.event_name == 'push'
       continue-on-error: true
