@@ -18,9 +18,9 @@ func (bR brokenReader) Read(_ []byte) (int, error) {
 }
 
 type YAMLTestSuite struct {
-	c *confiqyaml.Container
-
 	suite.Suite
+
+	c *confiqyaml.Container
 }
 
 func Test_YAMLTestSuite(t *testing.T) {

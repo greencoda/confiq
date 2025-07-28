@@ -166,8 +166,8 @@ func (t *customType) Decode(value any) error {
 
 [godoc-badge]: https://pkg.go.dev/badge/github.com/greencoda/confiq
 [godoc-url]: https://pkg.go.dev/github.com/greencoda/confiq
-[actions-badge]: https://github.com/greencoda/confiq/actions/workflows/test.yml/badge.svg
-[actions-url]: https://github.com/greencoda/confiq/actions/workflows/test.yml
+[actions-badge]: https://github.com/greencoda/confiq/actions/workflows/main.yml/badge.svg
+[actions-url]: https://github.com/greencoda/confiq/actions/workflows/main.yml
 [goversion-badge]: https://img.shields.io/badge/Go-1.22-%2300ADD8?logo=go
 [goversion-url]: https://golang.org/doc/go1.22
 [goreportcard-badge]: https://goreportcard.com/badge/github.com/greencoda/confiq

@@ -18,9 +18,9 @@ func (bR brokenReader) Read(_ []byte) (int, error) {
 }
 
 type EnvTestSuite struct {
-	c *confiqenv.Container
-
 	suite.Suite
+
+	c *confiqenv.Container
 }
 
 func Test_EnvTestSuite(t *testing.T) {

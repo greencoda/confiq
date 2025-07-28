@@ -18,9 +18,9 @@ func (bR brokenReader) Read(_ []byte) (int, error) {
 }
 
 type TOMLTestSuite struct {
-	c *confiqtoml.Container
-
 	suite.Suite
+
+	c *confiqtoml.Container
 }
 
 func Test_TOMLTestSuite(t *testing.T) {

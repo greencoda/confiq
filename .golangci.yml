@@ -5,6 +5,7 @@ linters:
   default: all
   disable:
     - dupl
+    - noinlineerr
     - funlen
     - gochecknoglobals
     - lll

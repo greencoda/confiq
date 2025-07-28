@@ -1,1 +1,9 @@
-name: "IValueContainer"
+packages:
+  github.com/greencoda/confiq:
+    config:
+      pkgname: 'mocks'
+      filename: "{{.InterfaceName}}.go"
+      structname: "{{.InterfaceName}}"
+      dir: "./mocks"
+    interfaces:
+      IValueContainer:

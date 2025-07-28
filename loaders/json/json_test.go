@@ -18,9 +18,9 @@ func (bR brokenReader) Read(_ []byte) (int, error) {
 }
 
 type JSONTestSuite struct {
-	c *confiqjson.Container
-
 	suite.Suite
+
+	c *confiqjson.Container
 }
 
 func Test_JSONTestSuite(t *testing.T) {

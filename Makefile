@@ -1,5 +1,5 @@
 .PHONY: deps lint mocks test test-cover
-.SILENT: test test-cover test-loaders
+.SILENT: test test-cover
 
 TESTABLE_PACKAGES = $(shell go list ./... | grep -v ./mocks)
 
@@ -10,7 +10,7 @@ deps:
 lint: deps
 	golangci-lint run -v
 
-mocks:
+mock:
 	rm -rf mocks/*
 	mockery
 

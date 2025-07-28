@@ -6,7 +6,7 @@ require (
 	github.com/goccy/go-yaml v1.18.0
 	github.com/hashicorp/go-envparse v0.1.0
 	github.com/pelletier/go-toml v1.9.5
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
