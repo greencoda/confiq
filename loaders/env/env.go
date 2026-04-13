@@ -30,7 +30,7 @@ type Container struct {
 	errors []error
 }
 
-// Get returns the loaded JSON values.
+// Get returns the loaded Env values.
 func (c *Container) Get() []any {
 	return c.values
 }
@@ -40,7 +40,7 @@ func (c *Container) Errors() []error {
 	return c.errors
 }
 
-// Load creates an empty container, into which the JSON values can be loaded.
+// Load creates an empty container, into which the Env values can be loaded.
 func Load() *Container {
 	container := new(Container)
 
@@ -62,7 +62,7 @@ func (c *Container) FromEnvironment() *Container {
 
 	c.values = append(c.values, envMap)
 
-	return nil
+	return c
 }
 
 // FromFile loads a Env file from the given path.
